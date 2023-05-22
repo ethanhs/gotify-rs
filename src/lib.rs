@@ -20,11 +20,11 @@ pub struct Gotify<'a> {
 }
 
 impl<'a> Gotify<'a> {
-    pub fn new(base_url: &'a str, app_token: &'a str, client_token: &'a str) -> Self {
+    pub fn new(base_url: &'a str, app_token: Option<&'a str>, client_token: Option<&'a str>) -> Self {
         Self {
             base_url: base_url.trim_end_matches("/"),
-            app_token: Some(app_token),
-            client_token: Some(client_token),
+            app_token: app_token,
+            client_token: client_token,
         }
     }
     pub fn config(mut self, base_url: &'a str, app_token: &'a str, client_token: &'a str) -> Self {
@@ -41,7 +41,7 @@ pub struct SyncGotify<'a> {
 }
 
 impl<'a> SyncGotify<'a> {
-    pub fn new(base_url: &'a str, app_token: &'a str, client_token: &'a str) -> Self {
+    pub fn new(base_url: &'a str, app_token: Option<&'a str>, client_token: Option<&'a str>) -> Self {
         let gotify = Gotify::new(base_url, app_token, client_token);
         let client = SyncClient::new();
         Self { gotify, client }
@@ -72,7 +72,8 @@ impl<'a> SyncGotify<'a> {
         auth_mode: Option<&str>,
     ) -> Result<T> {
         let method = Method::from_str(&method)?;
-        let request_url = format!("{}/{}", self.gotify.base_url, endpoint_url);
+        let request_url = format!("{}{}", self.gotify.base_url, endpoint_url);
+
         let mut request = self.client.request(method.clone(), request_url);
         if let Some(f) = file {
             request = request.body(f);
@@ -96,7 +97,7 @@ impl<'a> SyncGotify<'a> {
     }
 
     pub fn applications(&self) -> Result<Vec<Application>> {
-        self.do_request("get", "/applications", None, None, None)
+        self.do_request("get", "/application", None, None, None)
     }
 
     pub fn create_application(&self, name: String, description: String) -> Result<Application> {

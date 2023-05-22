@@ -17,7 +17,11 @@ pub struct AsyncGotify<'a> {
 }
 
 impl<'a> AsyncGotify<'a> {
-    pub fn new(base_url: &'a str, app_token: &'a str, client_token: &'a str) -> Self {
+    pub fn new(
+        base_url: &'a str,
+        app_token: Option<&'a str>,
+        client_token: Option<&'a str>,
+    ) -> Self {
         let gotify = Gotify::new(base_url, app_token, client_token);
         let client = AsyncClient::new();
         Self { gotify, client }
